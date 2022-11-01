@@ -5,16 +5,104 @@ from OpenGL.GLU import *
 import math
 
 
-def drawTruck():
-    glRotatef(0, 0, 0, 0)
+def cube(x1, y1, z1, x2, y2, z2, c1, c2, c3, scale):
+    width = x2 - x1
+    height = y2 - y1
+    depth = z2 - z1
+    width *= scale
+    height *= scale
+    depth *= scale
 
-    glColor4f(0.0, 0.0, 1.0, 0.0)
+    glColor3f(c1, c2, c3)
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
     glBegin(GL_QUADS)
-    glVertex3f(0.5, 0.5, 1)
-    glVertex3f(0.5, -1.5, 1)
-    glVertex3f(0.5, -1.5, 0)
-    glVertex3f(0.5, 0.5, 0)
+    glVertex3f(x1 * scale, y1 * scale, z1 * scale)
+    glVertex3f(x1 * scale + width, y1 * scale, z1 * scale)
+    glVertex3f(x1 * scale + width, y1 * scale + height, z1 * scale)
+    glVertex3f(x1 * scale, y1 * scale + height, z1 * scale)
     glEnd()
+
+    glColor3f(c1, c2, c3)
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
+    glBegin(GL_QUADS)
+    glVertex3f(x1 * scale, y1 * scale, z1 * scale)
+    glVertex3f(x1 * scale + width, y1 * scale, z1 * scale)
+    glVertex3f(x1 * scale + width, y1 * scale, z1 * scale + depth)
+    glVertex3f(x1 * scale, y1 * scale, z1 * scale + depth)
+    glEnd()
+
+    glColor3f(c1, c2, c3)
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
+    glBegin(GL_QUADS)
+    glVertex3f(x1 * scale, y1 * scale, z1 * scale)
+    glVertex3f(x1 * scale, y1 * scale + height, z1 * scale)
+    glVertex3f(x1 * scale, y1 * scale + height, z1 * scale + depth)
+    glVertex3f(x1 * scale, y1 * scale, z1 * scale + depth)
+    glEnd()
+
+    glColor3f(c1, c2, c3)
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
+    glBegin(GL_QUADS)
+    glVertex3f(x1 * scale + width, y1 * scale + height, z1 * scale + depth)
+    glVertex3f(x1 * scale, y1 * scale + height, z1 * scale + depth)
+    glVertex3f(x1 * scale, y1 * scale, z1 * scale + depth)
+    glVertex3f(x1 * scale + width, y1 * scale, z1 * scale + depth)
+    glEnd()
+
+    glColor3f(c1, c2, c3)
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
+    glBegin(GL_QUADS)
+    glVertex3f(x1 * scale + width, y1 * scale + height, z1 * scale + depth)
+    glVertex3f(x1 * scale, y1 * scale + height, z1 * scale + depth)
+    glVertex3f(x1 * scale, y1 * scale + height, z1 * scale)
+    glVertex3f(x1 * scale + width, y1 * scale + height, z1 * scale)
+    glEnd()
+
+    glColor3f(c1, c2, c3)
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
+    glBegin(GL_QUADS)
+    glVertex3f(x1 * scale + width, y1 * scale + height, z1 * scale + depth)
+    glVertex3f(x1 * scale + width, y1 * scale, z1 * scale + depth)
+    glVertex3f(x1 * scale + width, y1 * scale, z1 * scale)
+    glVertex3f(x1 * scale + width, y1 * scale + height, z1 * scale)
+    glEnd()
+
+
+def drawTruck(progress):
+    glRotatef(0, 0, 0, 0)
+    # draw 4 cude wheels
+    glTranslatef(- progress / 360, 0, 0)
+
+    def wheel():
+        glRotatef(-(progress % 360), 0, 1, 0)
+        glTranslatef(-0.5, 0, -0.5,)
+        cube(0.3, 1, 0.3, 0.7, 0, 0.7, 0.2, 0.2, 0.2, 1)
+        cube(0, 0, 0, 1, 1, 1, 0.1, 0.1, 0.1, 1)
+        glTranslatef(0.5, 0, 0.5)
+        glRotatef((progress % 360), 0,  1, 0)
+
+    wheel()
+    glTranslatef(0, 2, 0)
+    wheel()
+    glTranslatef(4, 0, 0)
+    wheel()
+    glTranslatef(0, -2, 0)
+    wheel()
+    glTranslatef(2, 0, 0)
+    wheel()
+    glTranslatef(0, 2, 0)
+    wheel()
+
+    # draw body
+    glTranslatef(-0.5, 0, 0.2)
+    cube(2, 1, 0, -4, -2, 3, 0.5, 0.5, 0.5, 1)
+
+    # draw cabin
+    glTranslatef(-5, 0, 0)
+    glTranslatef(1, 0, 0)
+    cube(-2.5, 0.8, 0.75, -2.5, -1.8, 1.8,  0.4, 0.4, 0.9, 1)
+    cube(-0.2, 1, 0, -2.5, -2, 2,  0.2, 0.2, 0.75, 1)
+    cube(-0.4, 0.6, 2, -0.6, 0.8, 3.25, 0.2, 0.2, 0.2, 1)
 
 
 def main():
@@ -55,6 +143,7 @@ def main():
     up_down_angle = 0.0
     paused = False
     run = True
+    progress = 0
     while run:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -119,7 +208,9 @@ def main():
 
             glPushMatrix()
 
-            drawTruck()
+            progress += 5
+
+            drawTruck(progress)
 
             glPopMatrix()
 
